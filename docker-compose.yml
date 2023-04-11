@@ -1,0 +1,29 @@
+version: '3.7'
+
+services:
+        hexacker:
+                build:
+                        context: .
+                        dockerfile: Dockerfile
+
+                container_name: hexacker
+                volumes:
+                        - ./src:/app/src
+                networks:
+                        - proxy
+                        - default
+                restart: always
+                labels:
+                        - 'traefik.enable=true'
+                        - 'traefik.docker.network=proxy'
+                        - 'traefik.http.routers.hexacker-secure.entrypoints=websecure'
+                        - 'traefik.http.routers.hexacker-secure.rule=Host(`hexacker.com`)'
+                        - 'traefik.http.routers.hexacker-secure.service=hexacker-service'
+                        - 'traefik.http.services.hexacker-service.loadbalancer.server.port=80'
+
+volumes:
+        db-data:
+                name: hexacker-data
+networks:
+        proxy:
+                external: true
